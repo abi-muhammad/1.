@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Kelas Modern • XI A1 (IPS) - SMA Negeri 1 Pasir Sakti</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen selection:bg-blue-500 selection:text-white transition-colors duration-300">
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- Top Global Bar (Live Clock, Status, Lofi, Theme) -->
+  <header class="sticky top-0 z-40 glass-nav transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+        
+        <!-- Brand / Class Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="classApp.switchTab('beranda')">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
+            <i data-lucide="graduation-cap" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-display font-black text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white class-name-text">
+                XI A1
+              </h1>
+              <span class="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-mono class-academic-year">
+                2026/2027
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[180px] sm:max-w-xs school-name-text">
+              SMA Negeri 1 Pasir Sakti • Lampung Timur
+            </p>
+          </div>
+        </div>
+
+        <!-- Center Live Clock Badge (Desktop) -->
+        <div class="hidden lg:flex items-center gap-3 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800 text-xs">
+          <span class="flex h-2 w-2 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span id="liveDateBadge" class="font-medium text-slate-600 dark:text-slate-300">Memuat tanggal...</span>
+          <span class="text-slate-300 dark:text-slate-700">•</span>
+          <span id="liveTimeBadge" class="font-mono font-bold text-blue-600 dark:text-blue-400">00:00:00 WIB</span>
+        </div>
+
+        <!-- Right Quick Controls (Lofi, Theme, Mobile Toggle) -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          
+          <!-- Lofi Ambient Player Toggle Button -->
+          <button id="lofiBtn" onclick="classApp.toggleLofiAmbient()" title="Toggle Study Ambient Sound (Rain & Relaxing Chord)" class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i data-lucide="headphones" class="w-4 h-4"></i>
+            <span id="lofiText" class="hidden sm:inline">Study Ambient</span>
+            <span id="lofiWaves" class="hidden items-end gap-0.5 h-3">
+              <span class="w-1 bg-white rounded-full wave-bar-1"></span>
+              <span class="w-1 bg-white rounded-full wave-bar-2"></span>
+              <span class="w-1 bg-white rounded-full wave-bar-3"></span>
+              <span class="w-1 bg-white rounded-full wave-bar-4"></span>
+            </span>
+          </button>
+
+          <!-- Theme Switcher -->
+          <button onclick="classApp.toggleTheme()" title="Ganti Tema (Gelap / Terang)" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i data-lucide="sun" class="w-4 h-4 theme-sun-icon hidden"></i>
+            <i data-lucide="moon" class="w-4 h-4 theme-moon-icon"></i>
+          </button>
+
+          <!-- Mobile Menu Hamburger -->
+          <button onclick="classApp.toggleMobileMenu()" class="lg:hidden p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Tabs -->
+      <nav class="hidden lg:flex items-center gap-1.5 py-2.5 border-t border-slate-200/50 dark:border-slate-800/50 overflow-x-auto no-scrollbar">
+        <button onclick="classApp.switchTab('beranda')" data-tab="beranda" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-blue-600 text-white shadow-md shadow-blue-500/20">
+          <i data-lucide="layout-grid" class="w-4 h-4"></i> Beranda
+        </button>
+        <button onclick="classApp.switchTab('organisasi')" data-tab="organisasi" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="network" class="w-4 h-4"></i> Struktur Kelas
+        </button>
+        <button onclick="classApp.switchTab('siswa')" data-tab="siswa" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="users" class="w-4 h-4"></i> Direktori Siswa
+        </button>
+        <button onclick="classApp.switchTab('jadwal')" data-tab="jadwal" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="calendar" class="w-4 h-4"></i> Jadwal & Piket
+        </button>
+        <button onclick="classApp.switchTab('kas')" data-tab="kas" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="wallet" class="w-4 h-4"></i> Kas Kelas
+        </button>
+        <button onclick="classApp.switchTab('tugas')" data-tab="tugas" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="check-square" class="w-4 h-4"></i> Tugas & PR
+        </button>
+        <button onclick="classApp.switchTab('galeri')" data-tab="galeri" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="image" class="w-4 h-4"></i> Galeri Kenangan
+        </button>
+        <button onclick="classApp.switchTab('funzone')" data-tab="funzone" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i> Class Fun Zone
+        </button>
+        <button onclick="classApp.switchTab('pengaturan')" data-tab="pengaturan" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 ml-auto">
+          <i data-lucide="settings" class="w-4 h-4"></i> Pengaturan
+        </button>
+      </nav>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobileMenuDrawer" class="hidden lg:hidden px-4 pb-4 pt-2 border-t border-slate-200/50 dark:border-slate-800/50 space-y-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+      <button onclick="classApp.switchTab('beranda')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="layout-grid" class="w-4 h-4 text-blue-500"></i> Beranda
+      </button>
+      <button onclick="classApp.switchTab('organisasi')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="network" class="w-4 h-4 text-indigo-500"></i> Struktur Kelas
+      </button>
+      <button onclick="classApp.switchTab('siswa')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="users" class="w-4 h-4 text-teal-500"></i> Direktori Siswa
+      </button>
+      <button onclick="classApp.switchTab('jadwal')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="calendar" class="w-4 h-4 text-orange-500"></i> Jadwal & Piket
+      </button>
+      <button onclick="classApp.switchTab('kas')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="wallet" class="w-4 h-4 text-emerald-500"></i> Kas Kelas
+      </button>
+      <button onclick="classApp.switchTab('tugas')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="check-square" class="w-4 h-4 text-rose-500"></i> Tugas & PR
+      </button>
+      <button onclick="classApp.switchTab('galeri')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="image" class="w-4 h-4 text-pink-500"></i> Galeri Kenangan
+      </button>
+      <button onclick="classApp.switchTab('funzone')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i> Class Fun Zone (Spin & Mading)
+      </button>
+      <button onclick="classApp.switchTab('pengaturan')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i> Pengaturan
+      </button>
+    </div>
+  </header>
+
+  <!-- Main App Content Area -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+    <!-- ============================================== -->
+    <!-- SECTION 1: BERANDA (DASHBOARD)                 -->
+    <!-- ============================================== -->
+    <section id="section-beranda" class="tab-content-section space-y-8">
+      
+      <!-- Modern Bento Hero Banner -->
+      <div class="relative rounded-3xl sm:rounded-[36px] overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white p-6 sm:p-12 shadow-2xl border border-white/10">
+        
+        <!-- Glowing Ambient Lights in Hero -->
+        <div class="absolute top-0 right-0 -mt-16 -mr-16 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-1/4 -mb-16 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-3xl">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-blue-300 mb-4">
+            <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+            <span class="class-nickname-text font-mono">ELEVEN A1 SOCIAL ELITE</span>
+            <span>•</span>
+            <span class="class-academic-year">2026/2027</span>
+          </div>
+
+          <h2 id="dynamicGreeting" class="text-3xl sm:text-5xl font-display font-extrabold tracking-tight leading-tight">
+            Selamat Datang di Portal Kelas 👋
+          </h2>
+
+          <p class="mt-4 text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl class-tagline-text">
+            Solidaritas Tanpa Batas, Cerdas Berkarakter Bersama XI A1 ✨ Rumah bagi 29 siswa berbakat, calon pemimpin, ekonom, dan wirausahawan masa depan.
+          </p>
+
+          <!-- Quick Action Buttons -->
+          <div class="mt-8 flex flex-wrap items-center gap-3 sm:gap-4" id="quickActions">
+            <button onclick="classApp.switchTab('siswa')" class="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-blue-500/30 transition flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4"></i> Lihat Anggota Kelas
+            </button>
+            <button onclick="classApp.switchTab('jadwal')" class="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm backdrop-blur-md border border-white/20 transition flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4"></i> Cek Jadwal Hari Ini
+            </button>
+            <button onclick="classApp.switchTab('funzone')" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:opacity-90 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> Spin Roda Giliran
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Bento Stats Grid -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        
+        <!-- Stat: Siswa -->
+        <div onclick="classApp.switchTab('siswa')" class="glass-panel glass-card p-5 rounded-3xl cursor-pointer">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Siswa</span>
+            <div class="w-9 h-9 rounded-2xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-2xl sm:text-3xl font-display font-bold text-slate-900 dark:text-white" id="statTotalStudents">36</div>
+          <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i> Lengkap 100% Aktif
+          </p>
+        </div>
+
+        <!-- Stat: Kas Kelas -->
+        <div onclick="classApp.switchTab('kas')" class="glass-panel glass-card p-5 rounded-3xl cursor-pointer">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Saldo Kas Kelas</span>
+            <div class="w-9 h-9 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <i data-lucide="wallet" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-2xl sm:text-3xl font-display font-bold text-emerald-600 dark:text-emerald-400 truncate" id="statTreasuryBalance">Rp 0</div>
+          <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+            <i data-lucide="activity" class="w-3 h-3 text-blue-500"></i> Transparan & Realtime
+          </p>
+        </div>
+
+        <!-- Stat: Tugas Aktif -->
+        <div onclick="classApp.switchTab('tugas')" class="glass-panel glass-card p-5 rounded-3xl cursor-pointer">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Tugas & PR Aktif</span>
+            <div class="w-9 h-9 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <i data-lucide="check-square" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-2xl sm:text-3xl font-display font-bold text-slate-900 dark:text-white" id="statActiveTasks">0 Tugas</div>
+          <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+            <i data-lucide="alert-circle" class="w-3 h-3 text-amber-500"></i> Perlu Diselesaikan
+          </p>
+        </div>
+
+        <!-- Stat: Piket Hari Ini -->
+        <div onclick="classApp.switchTab('jadwal')" class="glass-panel glass-card p-5 rounded-3xl cursor-pointer">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Piket Kebersihan</span>
+            <div class="w-9 h-9 rounded-2xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-2xl sm:text-3xl font-display font-bold text-slate-900 dark:text-white" id="statTodayDuty">7 Siswa</div>
+          <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+            <i data-lucide="calendar" class="w-3 h-3 text-purple-500"></i> Regu Piket Hari Ini
+          </p>
+        </div>
+      </div>
+
+      <!-- Two-Column Section: Papan Pengumuman & Profil Wali Kelas -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Papan Pengumuman Kelas (2 Cols) -->
+        <div class="lg:col-span-2 glass-panel p-6 sm:p-8 rounded-3xl">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-2xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <i data-lucide="bell" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Papan Pengumuman Kelas</h3>
+                <p class="text-xs text-slate-500">Informasi penting dan agenda terdekat</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="announcementsList" class="space-y-3">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Profil Wali Kelas Spotlight (1 Col) -->
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div>
+            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-500 mb-4">
+              <i data-lucide="award" class="w-4 h-4"></i> Wali Kelas
+            </div>
+
+            <div class="flex items-center gap-4 mb-4">
+              <img src="" alt="Wali Kelas" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-emerald-500/30 shadow-md homeroom-avatar-img">
+              <div>
+                <h4 class="font-bold text-slate-900 dark:text-white text-base homeroom-name-text">Maria Yuliati, S.Pd.I.</h4>
+                <p class="text-xs text-slate-500 homeroom-subject-text">Guru Pend. Agama • SMAN 1 Pasir Sakti</p>
+                <span class="inline-block text-[10px] font-mono text-slate-400 mt-0.5 homeroom-nip-text">NIP: 19820715 200801 2 015</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white/60 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-xs text-slate-600 dark:text-slate-300 italic leading-relaxed homeroom-quote-text">
+              "Keberhasilan bukan hanya diukur dari tingginya nilai akademik, melainkan dari ketulusan hati, akhlak mulia, dan kebersamaan kita."
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-xs">
+            <span class="text-slate-400 flex items-center gap-1">
+              <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-500"></i> Kontak Tersedia
+            </span>
+            <a href="https://instagram.com" target="_blank" class="text-blue-500 font-semibold flex items-center gap-1 hover:underline">
+              <i data-lucide="instagram" class="w-3.5 h-3.5"></i> @maria.yulianti.edu
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 2: STRUKTUR ORGANISASI KELAS           -->
+    <!-- ============================================== -->
+    <section id="section-organisasi" class="tab-content-section hidden space-y-6">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white">
+            Struktur Organisasi Kelas
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Pilar kepemimpinan dan penanggung jawab kelancaran aktivitas kelas <span class="class-name-text font-bold">XII MIPA 1</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Bento Grid Struktur -->
+      <div id="orgStructureContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 3: DIREKTORI SISWA                     -->
+    <!-- ============================================== -->
+    <section id="section-siswa" class="tab-content-section hidden space-y-6">
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white">
+            Direktori Siswa XI A1
+          </h2>
+          <p id="studentCountBadge" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Menampilkan seluruh siswa Kelas XI A1 SMAN 1 Pasir Sakti TA 2026/2027
+          </p>
+        </div>
+
+        <!-- Search Bar and Gender Filter -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+          
+          <!-- Search input -->
+          <div class="relative min-w-[220px]">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="text" oninput="classApp.onStudentSearch(this.value)" placeholder="Cari nama, absen, hobi..." class="w-full pl-10 pr-4 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white shadow-sm">
+          </div>
+
+          <!-- Gender filters -->
+          <div class="flex items-center p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-xs">
+            <button onclick="classApp.filterStudents('ALL')" data-gender="ALL" class="gender-filter-btn px-3 py-1.5 rounded-xl font-bold bg-blue-600 text-white shadow-md">
+              Semua
+            </button>
+            <button onclick="classApp.filterStudents('L')" data-gender="L" class="gender-filter-btn px-3 py-1.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:text-blue-500">
+              Putra
+            </button>
+            <button onclick="classApp.filterStudents('P')" data-gender="P" class="gender-filter-btn px-3 py-1.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:text-pink-500">
+              Putri
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Cards Grid -->
+      <div id="studentGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 4: JADWAL PELAJARAN & PIKET            -->
+    <!-- ============================================== -->
+    <section id="section-jadwal" class="tab-content-section hidden space-y-8">
+      
+      <!-- Top header with Print button -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white">
+            Jadwal Pelajaran & Piket
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Agenda belajar harian dan kelompok kebersihan kelas
+          </p>
+        </div>
+
+        <button onclick="window.print()" class="no-print px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-2 self-start sm:self-auto transition">
+          <i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF
+        </button>
+      </div>
+
+      <!-- Day Tabs (Senin - Jumat) -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        <button onclick="classApp.setScheduleDay('senin')" data-day="senin" class="schedule-day-tab px-5 py-2.5 rounded-2xl text-xs font-bold bg-blue-600 text-white shadow-md transition">
+          Senin
+        </button>
+        <button onclick="classApp.setScheduleDay('selasa')" data-day="selasa" class="schedule-day-tab px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Selasa
+        </button>
+        <button onclick="classApp.setScheduleDay('rabu')" data-day="rabu" class="schedule-day-tab px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Rabu
+        </button>
+        <button onclick="classApp.setScheduleDay('kamis')" data-day="kamis" class="schedule-day-tab px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Kamis
+        </button>
+        <button onclick="classApp.setScheduleDay('jumat')" data-day="jumat" class="schedule-day-tab px-5 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Jumat
+        </button>
+      </div>
+
+      <!-- Schedule Periods List -->
+      <div id="schedulePeriodsContainer" class="space-y-3">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Jadwal Piket Kebersihan Seminggu Penuh -->
+      <div class="pt-8 border-t border-slate-200/60 dark:border-slate-800/60">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-9 h-9 rounded-2xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-xl text-slate-900 dark:text-white">Jadwal Piket Kebersihan Harian</h3>
+            <p class="text-xs text-slate-500">Menjaga kebersihan dan kenyamanan ruang belajar kelas kita</p>
+          </div>
+        </div>
+
+        <div id="cleaningDutyGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 5: KAS KELAS                           -->
+    <!-- ============================================== -->
+    <section id="section-kas" class="tab-content-section hidden space-y-8">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white">
+            Buku Kas & Keuangan Kelas
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Transparansi pemasukan, pengeluaran, dan status iuran kas 36 siswa
+          </p>
+        </div>
+
+        <button onclick="classApp.openModal('addTransactionModal')" class="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-500/20 self-start sm:self-auto transition">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> Catat Transaksi Baru
+        </button>
+      </div>
+
+      <!-- Financial Metric Cards & Doughnut Chart -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Metrics (2 Cols) -->
+        <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="glass-panel p-5 rounded-3xl">
+            <span class="text-xs text-slate-400 block mb-1">Total Saldo Kas Saat Ini</span>
+            <div id="treasuryCurrentBalance" class="text-2xl sm:text-3xl font-display font-extrabold text-blue-600 dark:text-blue-400">Rp 0</div>
+            <p class="text-[11px] text-slate-400 mt-2">Saldo siap pakai keperluan kelas</p>
+          </div>
+          <div class="glass-panel p-5 rounded-3xl">
+            <span class="text-xs text-slate-400 block mb-1">Total Seluruh Pemasukan</span>
+            <div id="treasuryTotalIncome" class="text-2xl sm:text-3xl font-display font-extrabold text-emerald-500">+Rp 0</div>
+            <p class="text-[11px] text-slate-400 mt-2">Dari iuran kas & hadiah lomba</p>
+          </div>
+          <div class="glass-panel p-5 rounded-3xl">
+            <span class="text-xs text-slate-400 block mb-1">Total Seluruh Pengeluaran</span>
+            <div id="treasuryTotalExpense" class="text-2xl sm:text-3xl font-display font-extrabold text-rose-500">-Rp 0</div>
+            <p class="text-[11px] text-slate-400 mt-2">Untuk spidol, alat, & sosial</p>
+          </div>
+        </div>
+
+        <!-- Doughnut Chart (1 Col) -->
+        <div class="glass-panel p-6 rounded-3xl flex flex-col items-center justify-center">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Rasio Kas & Pengeluaran</h4>
+          <div class="relative w-44 h-44">
+            <canvas id="treasuryChartCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Riwayat Transaksi & Checklist Iuran Siswa -->
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        
+        <!-- Riwayat Transaksi (3 Cols) -->
+        <div class="lg:col-span-3 glass-panel p-6 rounded-3xl">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-900 dark:text-white text-base">Riwayat Transaksi Terakhir</h4>
+            <span class="text-xs text-slate-400">Urut dari terbaru</span>
+          </div>
+          <div id="treasuryTransactionsList" class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Status Pembayaran Iuran Bulan Ini (2 Cols) -->
+        <div class="lg:col-span-2 glass-panel p-6 rounded-3xl">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-bold text-slate-900 dark:text-white text-base">Iuran Kas Siswa</h4>
+            <span class="text-xs text-blue-500 font-bold">Rp 15.000 / bln</span>
+          </div>
+          <p id="kasPaidCounter" class="text-xs text-slate-500 mb-4">0/36 Siswa Lunas</p>
+          
+          <div id="treasuryStudentsPaymentGrid" class="space-y-1.5 max-h-[340px] overflow-y-auto pr-1">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 6: TUGAS & PR (KANBAN BOARD)          -->
+    <!-- ============================================== -->
+    <section id="section-tugas" class="tab-content-section hidden space-y-6">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white">
+            Papan Tugas & Pekerjaan Rumah
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Kelola deadline tugas, ujian, dan proyek praktikum bersama
+          </p>
+        </div>
+
+        <button onclick="classApp.openModal('addTaskModal')" class="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-500/20 self-start sm:self-auto transition">
+          <i data-lucide="plus" class="w-4 h-4"></i> Tambah Tugas Baru
+        </button>
+      </div>
+
+      <!-- Kanban 3 Columns -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Column 1: Belum Dikerjakan -->
+        <div class="p-4 rounded-3xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between px-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-sm">Belum Dikerjakan</h4>
+            </div>
+            <span id="badgeTaskTodoCount" class="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
+          </div>
+          <div id="taskColTodo" class="space-y-3 min-h-[200px]"></div>
+        </div>
+
+        <!-- Column 2: Sedang Dikerjakan -->
+        <div class="p-4 rounded-3xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between px-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-sm">Sedang Berlangsung</h4>
+            </div>
+            <span id="badgeTaskInprogCount" class="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
+          </div>
+          <div id="taskColInprogress" class="space-y-3 min-h-[200px]"></div>
+        </div>
+
+        <!-- Column 3: Selesai -->
+        <div class="p-4 rounded-3xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between px-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h4 class="font-bold text-slate-900 dark:text-white text-sm">Selesai Dikumpulkan</h4>
+            </div>
+            <span id="badgeTaskDoneCount" class="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
+          </div>
+          <div id="taskColDone" class="space-y-3 min-h-[200px]"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 7: GALERI KENANGAN                     -->
+    <!-- ============================================== -->
+    <section id="section-galeri" class="tab-content-section hidden space-y-6">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white">
+            Galeri Kenangan & Album Momen
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Jejak canda, tawa, dan perjuangan masa putih abu-abu kita
+          </p>
+        </div>
+
+        <button onclick="classApp.openModal('addPhotoModal')" class="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-500/20 self-start sm:self-auto transition">
+          <i data-lucide="upload" class="w-4 h-4"></i> Tambah Foto Kenangan
+        </button>
+      </div>
+
+      <!-- Filter Categories -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        <button onclick="classApp.filterGallery('ALL')" data-category="ALL" class="gallery-filter-btn px-4 py-2 rounded-2xl text-xs font-bold bg-blue-600 text-white shadow-md transition">
+          Semua Momen
+        </button>
+        <button onclick="classApp.filterGallery('Prestasi')" data-category="Prestasi" class="gallery-filter-btn px-4 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Prestasi
+        </button>
+        <button onclick="classApp.filterGallery('Study Tour')" data-category="Study Tour" class="gallery-filter-btn px-4 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Study Tour
+        </button>
+        <button onclick="classApp.filterGallery('Classmeet')" data-category="Classmeet" class="gallery-filter-btn px-4 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Classmeet
+        </button>
+        <button onclick="classApp.filterGallery('Praktikum')" data-category="Praktikum" class="gallery-filter-btn px-4 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Praktikum
+        </button>
+        <button onclick="classApp.filterGallery('Momen Seru')" data-category="Momen Seru" class="gallery-filter-btn px-4 py-2 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          Momen Seru
+        </button>
+      </div>
+
+      <!-- Photo Grid -->
+      <div id="galleryGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 8: CLASS FUN ZONE                      -->
+    <!-- ============================================== -->
+    <section id="section-funzone" class="tab-content-section hidden space-y-10">
+      
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+          Class Fun Zone <i data-lucide="sparkles" class="w-6 h-6 text-amber-500"></i>
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          Roda penentu giliran dan papan apresiasi / curhat kelas virtual
+        </p>
+      </div>
+
+      <!-- Feature 1: Lucky Wheel of Fortune -->
+      <div class="glass-panel p-6 sm:p-10 rounded-3xl" id="luckyWheelContainer">
+        <div class="max-w-xl mx-auto flex flex-col items-center text-center">
+          
+          <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 mb-2">
+            Wheel of Fortune 🎡
+          </span>
+          <h3 class="text-xl sm:text-2xl font-bold font-display text-slate-900 dark:text-white">
+            Roda Keberuntungan Siswa
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6">
+            Bingung siapa yang maju presentasi pertama, piket tambahan, atau jawab kuis? Putar rodanya!
+          </p>
+
+          <!-- Interactive Canvas Wheel with Red Pointer -->
+          <div class="relative my-4">
+            <div class="wheel-pointer"></div>
+            <canvas id="luckyWheelCanvas" width="340" height="340" class="rounded-full shadow-2xl ring-4 ring-slate-900/10 dark:ring-white/10"></canvas>
+          </div>
+
+          <!-- Spin Action Button -->
+          <div class="mt-6 flex flex-col items-center gap-3">
+            <button id="spinWheelBtn" onclick="classApp.spinWheel()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:opacity-90 text-white font-bold text-sm shadow-xl shadow-orange-500/30 transition transform hover:scale-105 active:scale-95 flex items-center gap-2">
+              <i data-lucide="play" class="w-4 h-4 fill-white"></i> Putar Roda Keberuntungan!
+            </button>
+            <span class="text-[11px] text-slate-400">Memuat nama 36 siswa secara otomatis</span>
+          </div>
+
+          <!-- Winner Display Container -->
+          <div id="wheelWinnerResult" class="mt-6 w-full max-w-md"></div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Mading Virtual & Sticky Notes -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-xl font-bold font-display text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="message-square" class="w-5 h-5 text-blue-500"></i> Papan Sticky Notes & Apresiasi
+            </h3>
+            <p class="text-xs text-slate-500">Tinggalkan pesan semangat atau saran untuk kebaikan kelas</p>
+          </div>
+
+          <button onclick="classApp.openModal('addNoteModal')" class="px-4 py-2.5 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold flex items-center gap-2 self-start sm:self-auto transition">
+            <i data-lucide="plus" class="w-4 h-4"></i> Tempel Pesan Baru
+          </button>
+        </div>
+
+        <div id="stickyNotesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SECTION 9: PENGATURAN                          -->
+    <!-- ============================================== -->
+    <section id="section-pengaturan" class="tab-content-section hidden space-y-8">
+      
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 dark:text-white">
+          Pengaturan & Manajemen Portal
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          Ubah identitas kelas, ekspor cadangan data JSON, atau reset data
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Form Kustomisasi Identitas Kelas (2 Cols) -->
+        <div class="lg:col-span-2 glass-panel p-6 sm:p-8 rounded-3xl">
+          <h3 class="font-bold text-slate-900 dark:text-white text-lg mb-4 flex items-center gap-2">
+            <i data-lucide="edit-3" class="w-5 h-5 text-blue-500"></i> Edit Identitas Kelas
+          </h3>
+
+          <form id="classSettingsForm" onsubmit="classApp.saveClassSettings(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nama Resmi Kelas</label>
+                <input type="text" name="classNameInput" required class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nama Keren / Julukan</label>
+                <input type="text" name="classNicknameInput" required class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nama Sekolah</label>
+                <input type="text" name="schoolNameInput" required class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Tahun Ajaran</label>
+                <input type="text" name="academicYearInput" required class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Slogan / Motto Kelas</label>
+              <input type="text" name="classTaglineInput" required class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nama Wali Kelas</label>
+                <input type="text" name="homeroomNameInput" required class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Mata Pelajaran Diampu</label>
+                <input type="text" name="homeroomSubjectInput" required class="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              </div>
+            </div>
+
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-md transition">
+              Simpan Perubahan
+            </button>
+          </form>
+        </div>
+
+        <!-- Backup, Restore, and Reset (1 Col) -->
+        <div class="space-y-6">
+          
+          <!-- Backup Card -->
+          <div class="glass-panel p-6 rounded-3xl">
+            <h4 class="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2">
+              <i data-lucide="download" class="w-4 h-4 text-emerald-500"></i> Ekspor Cadangan Data
+            </h4>
+            <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+              Unduh seluruh data siswa, kas, jadwal, dan tugas dalam file JSON untuk disimpan atau dibagikan ke teman.
+            </p>
+            <button onclick="classApp.exportDataJSON()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center justify-center gap-2">
+              <i data-lucide="file-down" class="w-4 h-4"></i> Ekspor Data JSON
+            </button>
+          </div>
+
+          <!-- Restore Card -->
+          <div class="glass-panel p-6 rounded-3xl">
+            <h4 class="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2">
+              <i data-lucide="upload-cloud" class="w-4 h-4 text-blue-500"></i> Pulihkan Cadangan
+            </h4>
+            <p class="text-xs text-slate-500 mb-3 leading-relaxed">
+              Unggah file backup JSON yang pernah diekspor sebelumnya.
+            </p>
+            <input type="file" id="importJsonInput" accept=".json" onchange="classApp.importDataJSON(this)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          </div>
+
+          <!-- Reset Card -->
+          <div class="glass-panel p-6 rounded-3xl border border-rose-200 dark:border-rose-950/60">
+            <h4 class="font-bold text-rose-600 dark:text-rose-400 text-base mb-2 flex items-center gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i> Reset Data Awal
+            </h4>
+            <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+              Mengembalikan semua data kembali ke contoh awal bawaan website.
+            </p>
+            <button onclick="classApp.resetData()" class="w-full py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-600 dark:text-rose-300 text-xs font-bold transition">
+              Kembalikan Data Default
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODALS                                         -->
+  <!-- ============================================== -->
+
+  <!-- 1. Detail Siswa Modal -->
+  <div id="studentDetailModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="glass-panel rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20" id="studentModalContent">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+
+  <!-- 2. Tambah Tugas Modal -->
+  <div id="addTaskModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/20">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold font-display text-lg text-slate-900 dark:text-white">Tambah Tugas / PR Baru</h3>
+        <button onclick="classApp.closeModal('addTaskModal')" class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="classApp.addNewTask(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Judul Tugas / Proyek</label>
+          <input type="text" name="taskTitle" required placeholder="Contoh: Makalah Bioteknologi..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Mata Pelajaran</label>
+            <input type="text" name="taskSubject" required placeholder="Fisika, Kimia, dll" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Prioritas</label>
+            <select name="taskPriority" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              <option value="Tinggi">Tinggi (Mendesak)</option>
+              <option value="Sedang" selected>Sedang</option>
+              <option value="Rendah">Rendah (Santai)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Tanggal Deadline</label>
+          <input type="date" name="taskDeadline" required class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Keterangan / Instruksi Guru</label>
+          <textarea name="taskDesc" rows="3" placeholder="Format pengumpulan, buku, atau instruksi..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white"></textarea>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="classApp.closeModal('addTaskModal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md">
+            Simpan Tugas
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Catat Transaksi Kas Modal -->
+  <div id="addTransactionModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/20">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold font-display text-lg text-slate-900 dark:text-white">Catat Transaksi Kas Baru</h3>
+        <button onclick="classApp.closeModal('addTransactionModal')" class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="classApp.addNewTransaction(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Jenis Transaksi</label>
+          <select name="trxType" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+            <option value="income">Pemasukan (+)</option>
+            <option value="expense">Pengeluaran (-)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Deskripsi Transaksi</label>
+          <input type="text" name="trxDesc" required placeholder="Contoh: Beli Spidol Whiteboard & Tinta..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Nominal (Rp)</label>
+            <input type="number" name="trxAmount" required placeholder="50000" min="1" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Kategori</label>
+            <select name="trxCategory" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              <option value="Iuran Kas">Iuran Kas</option>
+              <option value="Perlengkapan">Perlengkapan</option>
+              <option value="Sosial">Sosial / Donasi</option>
+              <option value="Acara">Acara / Lomba</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Tanggal Transaksi</label>
+          <input type="date" name="trxDate" required class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="classApp.closeModal('addTransactionModal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md">
+            Catat Transaksi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Tambah Foto Galeri Modal -->
+  <div id="addPhotoModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/20">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold font-display text-lg text-slate-900 dark:text-white">Tambah Foto Kenangan Baru</h3>
+        <button onclick="classApp.closeModal('addPhotoModal')" class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="classApp.addNewGalleryPhoto(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Judul Kegiatan / Momen</label>
+          <input type="text" name="photoTitle" required placeholder="Contoh: Kemenangan Futsal Classmeet..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">URL Gambar (Unsplash / Link Foto)</label>
+          <input type="url" name="photoUrl" required placeholder="https://images.unsplash.com/..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white font-mono">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Kategori</label>
+            <select name="photoCategory" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+              <option value="Prestasi">Prestasi</option>
+              <option value="Study Tour">Study Tour</option>
+              <option value="Classmeet">Classmeet</option>
+              <option value="Praktikum">Praktikum</option>
+              <option value="Momen Seru" selected>Momen Seru</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Tanggal</label>
+            <input type="text" name="photoDate" required placeholder="Contoh: 24 Okt 2026" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Deskripsi / Cerita Singkat</label>
+          <textarea name="photoDesc" rows="3" placeholder="Ceritakan keseruan momen ini..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white"></textarea>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="classApp.closeModal('addPhotoModal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md">
+            Simpan Foto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Fullscreen Lightbox Modal -->
+  <div id="lightboxModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden">
+    <button onclick="classApp.closeLightbox()" class="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition">
+      <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+    <div class="max-w-4xl w-full text-center">
+      <img id="lightboxImage" src="" alt="Preview" class="max-h-[75vh] mx-auto rounded-2xl shadow-2xl object-contain mb-4 ring-1 ring-white/10">
+      <h3 id="lightboxTitle" class="text-xl font-bold font-display text-white"></h3>
+      <p id="lightboxDesc" class="text-xs text-slate-300 mt-1 max-w-xl mx-auto"></p>
+      <span id="lightboxDate" class="text-[11px] font-mono text-slate-400 mt-2 block"></span>
+    </div>
+  </div>
+
+  <!-- 6. Tambah Sticky Note Modal -->
+  <div id="addNoteModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 shadow-2xl border border-white/20">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold font-display text-lg text-slate-900 dark:text-white">Tempel Sticky Note Baru</h3>
+        <button onclick="classApp.closeModal('addNoteModal')" class="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="classApp.addNewStickyNote(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Pengirim (Boleh kosong / Anonim)</label>
+          <input type="text" name="noteSender" placeholder="Nama kamu atau 'Anonim'..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Pilih Warna Sticky Note</label>
+          <select name="noteColor" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white">
+            <option value="amber">Kuning Hangat (Default)</option>
+            <option value="blue">Biru Langit</option>
+            <option value="emerald">Hijau Mint</option>
+            <option value="purple">Ungu Lavender</option>
+            <option value="pink">Pink Ceria</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">Isi Pesan / Semangat</label>
+          <textarea name="noteText" required rows="4" placeholder="Tuliskan pesan apresiasi atau kata-kata penyemangat..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500 dark:text-white"></textarea>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="classApp.closeModal('addNoteModal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md">
+            Tempelkan Pesan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-16 border-t border-slate-200/60 dark:border-slate-800/60 py-8 text-center text-xs text-slate-400 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-700 dark:text-slate-300 class-name-text">XI A1</span>
+        <span>•</span>
+        <span class="school-name-text">SMA Negeri 1 Pasir Sakti • Lampung Timur</span>
+      </div>
+      <p>Dibuat dengan ❤️ & teknologi web modern untuk kebersamaan kelas.</p>
+    </div>
+  </footer>
+
+  <!-- App Logic Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
